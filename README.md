@@ -9,7 +9,7 @@ This project implements and compares four different approaches for enzyme classi
 1. **ESM-2 Only (8M)**: Direct classification using ESM-2 (8M parameters) embeddings with simple linear layers
 2. **ESM-2 + Random Forest**: Traditional machine learning approach with ESM-2 features
 3. **ESM-2 + MLP (8M)**: Deep neural network classifier with 8M parameter ESM-2 (🏆 **Best Performance**)
-4. **ESM-2 (860M)**: Large-scale model comparison using 860M parameter ESM-2 with suboptimal preprocessing
+4. **ESM-2 (650M)**: Large-scale model comparison using 650M parameter ESM-2 with suboptimal preprocessing
 
 All models use state-of-the-art protein embeddings from Meta's ESM-2 (Evolutionary Scale Modeling) transformer model to capture structural and functional information from protein sequences.
 
@@ -18,13 +18,13 @@ All models use state-of-the-art protein embeddings from Meta's ESM-2 (Evolutiona
 Our comprehensive analysis revealed:
 - **🥇 ESM-2 + MLP (8M)**: Superior performance due to non-linear feature learning and proper preprocessing
 - **🥈 ESM-2 Only (8M)**: Good baseline performance but limited by linear transformations
-- **🥉 ESM-2 (860M)**: Large model with suboptimal preprocessing - demonstrates importance of data quality
+- **🥉 ESM-2 (650M)**: Large model with suboptimal preprocessing - demonstrates importance of data quality
 - **🥉 ESM-2 + Random Forest**: Struggles with high-dimensional continuous embeddings
 
 ### Key Features
 
-- **Multi-Scale Model Comparison**: From 8M to 860M parameter ESM-2 models
-- **Protein Language Model Integration**: Uses both ESM-2 8M and 860M parameter variants
+- **Multi-Scale Model Comparison**: From 8M to 650M parameter ESM-2 models
+- **Protein Language Model Integration**: Uses both ESM-2 8M and 650M parameter variants
 - **Multi-Architecture Comparison**: Four different approaches for comprehensive evaluation
 - **Multi-task Learning**: Simultaneously predicts EC1 and EC2 classification levels
 - **Class Imbalance Handling**: Implements multiple strategies (weighted BCE, focal loss)
@@ -53,9 +53,9 @@ Protein Sequence → ESM-2-8M Embeddings → Multi-Layer Perceptron → EC1 + EC
      (Raw)             (320-dim)          (Hidden Layers + Dropout)   (Multi-class)
 ```
 
-### 4. ESM-2 (860M Parameters) Architecture
+### 4. ESM-2 (650M Parameters) Architecture
 ```
-Protein Sequence → ESM-2-860M Embeddings → Dual-Head Classifier → EC1 + EC2 Predictions
+Protein Sequence → ESM-2-650M Embeddings → Dual-Head Classifier → EC1 + EC2 Predictions
      (Raw)             (1280-dim)           (Dropout + Linear)      (Multi-class)
                     [Suboptimal Preprocessing]
 ```
@@ -91,9 +91,9 @@ pip install xgboost lightgbm  # For ensemble methods comparison
 
 ### Hardware Requirements
 
-- **GPU**: NVIDIA GPU with CUDA support (A100/V100 recommended for 860M model)
-- **Memory**: 16GB+ RAM for 8M model, 32GB+ RAM for 860M model
-- **VRAM**: 8GB+ for 8M model, 24GB+ for 860M model
+- **GPU**: NVIDIA GPU with CUDA support (A100/V100 recommended for 650M model)
+- **Memory**: 16GB+ RAM for 8M model, 32GB+ RAM for 650M model
+- **VRAM**: 8GB+ for 8M model, 24GB+ for 650M model
 - **Storage**: 10GB+ for model weights, embeddings, and results
 
 ### Data Format
@@ -129,7 +129,7 @@ The training pipeline includes essential preprocessing steps to clean and standa
    # MKLLVL... → ['1.1.1.1', '2.3.1.12']
    ```
 
-### Suboptimal Preprocessing (Used in 860M Model)
+### Suboptimal Preprocessing (Used in 650M Model)
 - **Missing Deduplication**: Did not merge sequences with multiple EC annotations
 - **Incomplete Data Cleaning**: Some preprocessing steps were not applied consistently
 - **Result**: Demonstrates that proper preprocessing is more important than model size
@@ -142,7 +142,7 @@ The project includes several pre-trained models and data files:
 
 #### Model Checkpoints
 - `enhanced_ec_classifier_8M.pt`: ESM-2 8M parameter model (properly preprocessed)
-- `ec_classifier_860M.pt`: ESM-2 860M parameter model (suboptimal preprocessing)
+- `ec_classifier_650M.pt`: ESM-2 650M parameter model (suboptimal preprocessing)
 - `best_mlp_ec_classifier.pt`: MLP model (best performance)
 - `rf_ec_classifier.pkl`: Random Forest model
 
@@ -156,7 +156,7 @@ The project includes several pre-trained models and data files:
 - `ESM-2 + MLP.ipynb`: MLP implementation and training
 - `ESM-2 + Random_Forest.ipynb`: Random Forest approach
 - `ESM-2(8M).ipynb`: 8M parameter model experiments
-- `Model1(860M) (1).ipynb`: 860M parameter model experiments
+- `Model1(650M) (1).ipynb`: 650M parameter model experiments
 
 ### Running Model Comparisons
 
@@ -172,8 +172,8 @@ mlp_model.load_state_dict(mlp_checkpoint['model_state_dict'])
 # Load 8M parameter model
 esm8m_checkpoint = torch.load("enhanced_ec_classifier_8M.pt")
 
-# Load 860M parameter model
-esm860m_checkpoint = torch.load("ec_classifier_860M.pt")
+# Load 650M parameter model
+esm650m_checkpoint = torch.load("ec_classifier_650M.pt")
 ```
 
 #### 2. Load Pre-computed Embeddings
@@ -200,8 +200,8 @@ python ESM-2\ +\ MLP.ipynb
 # Train Random Forest model
 python ESM-2\ +\ Random_Forest.ipynb
 
-# Train 860M parameter model (for comparison)
-python Model1(860M)\ (1).ipynb
+# Train 650M parameter model (for comparison)
+python Model1(650M)\ (1).ipynb
 ```
 
 ### Making Predictions
@@ -231,7 +231,7 @@ print(f"Overall Confidence: {(conf1 + conf2) / 2:.4f}")
 |-------|------------|---------------|----------|----------|-----------------|---------------|--------------|
 | **ESM-2 + MLP (8M)** 🏆 | 8M | ✅ Optimal | **0.89** | **0.77** | **Best** | ~2h | 8GB VRAM |
 | ESM-2 Only (8M) | 8M | ✅ Optimal | 0.83 | 0.74 | -6.7% micro | ~45min | 6GB VRAM |
-| ESM-2 (860M) | 860M | ❌ Suboptimal | 0.75* | 0.68* | -15.7% micro | ~8h | 24GB VRAM |
+| ESM-2 (650M) | 650M | ❌ Suboptimal | 0.75* | 0.68* | -15.7% micro | ~8h | 24GB VRAM |
 | ESM-2 + Random Forest | 8M | ✅ Optimal | 0.68 | 0.49 | -23.6% micro | ~30min | 16GB RAM |
 
 *Estimated performance with suboptimal preprocessing
@@ -245,8 +245,8 @@ print(f"Overall Confidence: {(conf1 + conf2) / 2:.4f}")
 
 **📊 Model Size vs. Data Quality Trade-off:**
 
-The comparison between ESM-2 8M (proper preprocessing) and ESM-2 860M (suboptimal preprocessing) demonstrates:
-- **Data Quality > Model Size**: 8M model with proper preprocessing outperforms 860M model
+The comparison between ESM-2 8M (proper preprocessing) and ESM-2 650M (suboptimal preprocessing) demonstrates:
+- **Data Quality > Model Size**: 8M model with proper preprocessing outperforms 650M model
 - **Preprocessing Impact**: Sequence deduplication and proper EC merging are critical
 - **Resource Efficiency**: 8M model is 100x smaller but potentially more effective
 
@@ -256,7 +256,7 @@ The comparison between ESM-2 8M (proper preprocessing) and ESM-2 860M (suboptima
 3. **Consistent Cleaning**: Removes noise and standardizes input format
 4. **Label Quality**: Proper EC formatting improves classification accuracy
 
-**⚠️ Lessons from 860M Model:**
+**⚠️ Lessons from 650M Model:**
 - Large models cannot compensate for poor data preprocessing
 - Computational resources are wasted without proper data preparation
 - Model complexity should match data quality and problem requirements
@@ -265,9 +265,9 @@ The comparison between ESM-2 8M (proper preprocessing) and ESM-2 860M (suboptima
 
 #### ESM-2 Model Variants
 - **8M Parameters**: 6 layers, 320 hidden dimensions, 20 attention heads
-- **860M Parameters**: 33 layers, 1280 hidden dimensions, 20 attention heads
+- **650M Parameters**: 33 layers, 1280 hidden dimensions, 20 attention heads
 - **Context Length**: Both support up to 1022 amino acids
-- **Embedding Quality**: 860M provides richer representations but requires quality data
+- **Embedding Quality**: 650M provides richer representations but requires quality data
 
 #### Korean Comments Note
 *Some code comments may appear in Korean as this project involved collaboration with Korean researchers. The functionality and documentation remain fully accessible in English.*
@@ -277,7 +277,7 @@ The comparison between ESM-2 8M (proper preprocessing) and ESM-2 860M (suboptima
 | Model | GPU Memory | Training Time | Inference Speed | Disk Space |
 |-------|------------|---------------|-----------------|------------|
 | ESM-2 8M | 6-8GB | 2-4 hours | 50 seq/sec | 2GB |
-| ESM-2 860M | 20-24GB | 8-12 hours | 10 seq/sec | 8GB |
+| ESM-2 650M | 20-24GB | 8-12 hours | 10 seq/sec | 8GB |
 | MLP Only | 2-4GB | 1-2 hours | 200 seq/sec | 500MB |
 | Random Forest | CPU only | 30 min | 100 seq/sec | 100MB |
 
@@ -308,10 +308,10 @@ def get_esm2_embeddings(sequences, model, tokenizer):
     return np.array(embeddings)
 ```
 
-#### 860M Parameter Model (esm2_t33_650M_UR50D)
+#### 650M Parameter Model (esm2_t33_650M_UR50D)
 ```python
-# Load 860M parameter model
-model_name = "facebook/esm2_t33_650M_UR50D"  # Actually 860M parameters
+# Load 650M parameter model
+model_name = "facebook/esm2_t33_650M_UR50D"  # Actually 650M parameters
 tokenizer = EsmTokenizer.from_pretrained(model_name)
 model = EsmModel.from_pretrained(model_name)
 
@@ -388,7 +388,7 @@ def clean_sequence(seq):
 ec-enzyme-classifier/
 ├── models/
 │   ├── enhanced_ec_classifier_8M.pt      # 8M parameter model (optimal preprocessing)
-│   ├── ec_classifier_860M.pt             # 860M parameter model (suboptimal preprocessing)
+│   ├── ec_classifier_650M.pt             # 650M parameter model (suboptimal preprocessing)
 │   ├── best_mlp_ec_classifier.pt         # MLP model (best performance)
 │   └── rf_ec_classifier.pkl              # Random Forest model
 ├── data/
@@ -400,7 +400,7 @@ ec-enzyme-classifier/
 │   ├── ESM-2 + MLP.ipynb                 # MLP implementation
 │   ├── ESM-2 + Random_Forest.ipynb       # Random Forest approach
 │   ├── ESM-2(8M).ipynb                   # 8M parameter experiments
-│   └── Model1(860M) (1).ipynb            # 860M parameter experiments
+│   └── Model1(650M) (1).ipynb            # 650M parameter experiments
 ├── results/
 │   ├── performance_comparison.json        # Comparative results
 │   ├── mlp_training_history.json         # MLP training metrics
@@ -419,7 +419,7 @@ After training, each model generates:
 
 #### ESM-2 Models
 - `enhanced_ec_classifier_8M.pt`: 8M parameter model with proper preprocessing
-- `ec_classifier_860M.pt`: 860M parameter model with suboptimal preprocessing
+- `ec_classifier_650M.pt`: 650M parameter model with suboptimal preprocessing
 - Training logs and performance metrics for each model
 
 #### Random Forest
@@ -431,7 +431,7 @@ After training, each model generates:
 
 ### Memory Optimization for Large Models
 
-For the 860M parameter model:
+For the 650M parameter model:
 ```python
 # Enable memory-efficient training
 torch.backends.cudnn.benchmark = True
@@ -445,8 +445,8 @@ from torch.cuda.amp import autocast, GradScaler
 scaler = GradScaler()
 
 # Batch size adjustment
-if model_size == "860M":
-    batch_size = 16  # Reduced for 860M model
+if model_size == "650M":
+    batch_size = 16  # Reduced for 650M model
 else:
     batch_size = 128  # Standard for 8M model
 ```
@@ -462,7 +462,7 @@ PATIENCE = 10
 DROPOUT_RATES = [0.3, 0.4, 0.5]
 ```
 
-#### For 860M Model
+#### For 650M Model
 ```python
 LEARNING_RATE = 5e-4  # Lower learning rate for stability
 BATCH_SIZE = 16       # Smaller batch size for memory
@@ -474,12 +474,12 @@ PATIENCE = 5          # Earlier stopping
 
 ### Preprocessing Impact Study
 
-Our comparison between 8M (optimal) and 860M (suboptimal) models demonstrates:
+Our comparison between 8M (optimal) and 650M (suboptimal) models demonstrates:
 
 | Preprocessing Quality | Model Size | Performance | Resource Usage | Recommendation |
 |----------------------|------------|-------------|----------------|----------------|
 | ✅ Optimal | 8M | **Best** | Low | **Use This** |
-| ❌ Suboptimal | 860M | Poor | Very High | Avoid |
+| ❌ Suboptimal | 650M | Poor | Very High | Avoid |
 
 **Key Lesson**: Data quality and preprocessing are more critical than model size for enzyme classification.
 
@@ -499,7 +499,7 @@ Our comparison between 8M (optimal) and 860M (suboptimal) models demonstrates:
 - ✅ Good performance for linear classification
 - ❌ Limited by linear transformations
 
-**ESM-2 (860M) - Resource Intensive** ⚠️
+**ESM-2 (650M) - Resource Intensive** ⚠️
 - ✅ Rich protein representations
 - ✅ Potential for transfer learning
 - ❌ Requires proper preprocessing to shine
@@ -542,7 +542,7 @@ Contributions are welcome! Priority areas for improvement:
 ### Model Enhancements
 - **Ensemble Methods**: Combine predictions from multiple models
 - **Preprocessing Optimization**: Further improve data cleaning pipeline
-- **Model Distillation**: Transfer knowledge from 860M to smaller models
+- **Model Distillation**: Transfer knowledge from 650M to smaller models
 - **Cross-Validation**: Robust performance evaluation across folds
 
 ### Experimental Extensions
@@ -569,7 +569,7 @@ Contributions are welcome! Priority areas for improvement:
 
 ### Common Issues and Solutions
 
-1. **CUDA Out of Memory (860M Model)**:
+1. **CUDA Out of Memory (650M Model)**:
    ```python
    # Reduce batch size dramatically
    batch_size = 8  # or even 4
@@ -584,7 +584,7 @@ Contributions are welcome! Priority areas for improvement:
    torch.cuda.empty_cache()
    ```
 
-2. **Poor Performance with 860M Model**:
+2. **Poor Performance with 650M Model**:
    - ✅ **Solution**: Implement proper preprocessing pipeline
    - ✅ Focus on sequence deduplication and EC number merging
    - ✅ Consider fine-tuning instead of feature extraction
@@ -625,7 +625,7 @@ Contributions are welcome! Priority areas for improvement:
 
 ### Detailed Metrics Comparison
 
-| Metric | ESM-2+MLP(8M) | ESM-2 Only(8M) | ESM-2(860M) | Random Forest |
+| Metric | ESM-2+MLP(8M) | ESM-2 Only(8M) | ESM-2(650M) | Random Forest |
 |--------|---------------|----------------|-------------|---------------|
 | **Micro F1** | **0.89** | 0.83 | ~0.75 | 0.68 |
 | **Macro F1** | **0.77** | 0.74 | ~0.68 | 0.49 |
@@ -645,7 +645,7 @@ Performance ↑
      │
 0.80 │
      │
-0.75 │           📊 ESM2(860M)
+0.75 │           📊 ESM2(650M)
      │
 0.70 │                      🌳 Random Forest
      │
